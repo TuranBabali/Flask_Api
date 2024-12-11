@@ -4,8 +4,27 @@ auth_namespace = Namespace('auth', description="a namespace for authentication")
 
 
 
-@auth_namespace.route('/')
-class HelloAuth(Resource):
+@auth_namespace.route('/signup')
+class Signup(Resource):
+
+    def post(self):
+
+        """
+            Create a new user account
+        """
     
-    def get(self):
-        return {'message': 'Hello, Authenticated User!'}
+        pass
+
+
+
+@auth_namespace.route('/login')
+class Login(Resource):
+
+    def post(self):
+        """
+            Generate a new JWT pair
+        """
+        pass
+    
+
+
