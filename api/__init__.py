@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restx import Api
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 
 
 from .orders.views import order_namespace
@@ -18,6 +19,8 @@ def create_app(config=config_dict['dev']):
 
     db.init_app(app)
     migrate= Migrate(app,db)
+
+    jwt=JWTManager(app)  
 
     api=Api(app)
 

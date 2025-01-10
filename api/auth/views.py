@@ -1,6 +1,9 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import (create_access_token, create_refresh_token,
+jwt_required,get_jwt_identity)
+from http import HTTPStatus
 
 from api.models.users import User
 from api.utils import db
@@ -26,6 +29,14 @@ user_model= auth_namespace.model(
         'is_staff': fields.Boolean(description="This shows that User is a staff"),  # if user is a staff member
     }
 
+)
+
+
+login_model= auth_namespace.model(
+    'Login', {  
+        'email': fields.String(required=True,description="Email"),
+        'password': fields.String(required=True,description="Password"), 
+    }
 )
  
 
@@ -61,13 +72,42 @@ class Signup(Resource):
 
 
 @auth_namespace.route('/login')
-class Login(Resource):
-
+class Login(Resource):  
+    @auth_namespace.expect(login_model)
+    @auth_namespace.marshal_with(user_model)  
     def post(self):
         """
             Generate a new JWT pair
         """
-        pass
+        data= request.get_json()
+
+        email= request.get('email')
+        backend_password= request.get(' password')
+
+        user= User.query.filter_by(email=email).first() 
+        
+        if user is not None and check_password_hash(user.password_hash,backend_password):
+            access_token= create_access_token(identity=user.username)
+            refresh_token= create_refresh_token(identity=user.username)
+
+            response= {
+                'access_token': access_token,
+               'refresh_token': refresh_token
+            }
+
+            return response, HTTPStatus.OK 
+
+
+@auth_namespace.route('/refresh')
+class Refresh(Resource):
+    @jwt_required(refresh=True) # refresh true ne demekdir
+
+    @auth_namespace.marshal_with(user_model)  
+    def post(self):
+        username= get_jwt_identity()
+
+        access_token= create_access_token(identity=username) 
+        return {'access_token': access_token}, HTTPStatus.OK
     
 
 
