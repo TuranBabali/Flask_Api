@@ -9,7 +9,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATION = False
 
 class DevConfig(Config):
-    DEBUG= config('DEBUG', cast=bool)
+   # DEBUG= config('DEBUG', cast=bool)
+    DEBUG = True
     SQLALCHEMY_ECHO= True
     SQLALCHEMY_DATABASE_URI= 'sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3')
     
