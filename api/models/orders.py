@@ -29,3 +29,11 @@ class Order(db.Model):
                     
     def __repr__(self):
         return f'<Order {self.id}>' 
+    
+    @classmethod
+    def get_by_id(cls, id):
+        return cls.query.get_or_404(id) 
+    
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit() 
