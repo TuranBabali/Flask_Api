@@ -17,6 +17,7 @@ class OrderStatus(PyEnum):
     DELIVERED = 'delivered'
 
 
+
 class Order(db.Model):
     __tablename__ = 'orders'
 
@@ -25,14 +26,15 @@ class Order(db.Model):
     order_status: Mapped[OrderStatus] = mapped_column(SAEnum(OrderStatus), default=OrderStatus.PENDING)
     flavour: Mapped[str] = mapped_column(String, nullable=False)
     date_created: Mapped[DateTime] = mapped_column(DateTime, default=datetime.utcnow)
-
-
-    
+    quantity: Mapped[int]= mapped_column(Integer())
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     customer: Mapped["User"]= relationship("User", back_populates="orders")
     def __repr__(self):
         return f"<Order {self.id}>"
     
+    @classmethod
+    def get_by_id(cls,id):
+        return cls.query.get_or_404(id)
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -51,6 +53,9 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.username}>"
     
+    @classmethod
+    def get_by_id(cls,id):
+        return cls.query.get_or_404(id)
 
     
         
